@@ -1,14 +1,15 @@
 import {useState} from 'react'
 import { useSnapshot } from 'valtio'
 import { AnimatePresence,motion } from 'framer-motion'
-// import config from '../config/config'
 import State from '../store';
-// import {download} from '../assets'
-import { downloadCanvasToImage, reader } from '../config/helpers'
+
+import {  reader } from '../config/helpers'
 import { EditorTabs, FilterTabs, DecalTypes} from '../config/constants';
 import { fadeAnimation, slideAnimation } from '../config/motion';
-import { AIPicker, ColorPicker, CustomButton, FilePicker, Tab } from '../components';
+import { ColorPicker, CustomButton, FilePicker, Tab } from '../components';
 import state from '../store';
+
+import {downloadCanvasToImage} from '../config/helpers'
 
 
  
@@ -17,13 +18,14 @@ const Customizer = () => {
 
   const [file, setFile] = useState('');
 
-  const [prompt, setPrompt] = useState('');
-
-  const [generatingImg, setGeneratingImg] = useState(false);
-
   const [activeEditorTab, setActiveEditorTab] = useState('');
 
   const [activeFilterTab, setActiveFilterTab] = useState({logoShirt: true, stylishShirt: false});
+
+  const handleDownload = () => {
+    downloadCanvasToImage();
+  };
+  
 
   const generateTabContent = () => {
     switch (activeEditorTab) {
@@ -32,30 +34,14 @@ const Customizer = () => {
       case "filepicker":
         return <FilePicker 
         file={file} setFile={setFile} readFile={readFile}/>
-      // case "aipicker":
-      //   return <AIPicker prompt={prompt} setPrompt={setPrompt} GeneratingImg={generatingImg}
-      //   handleSubmit={handleSubmit}/>
+      
       default:
         return null;
     }
   };
 
-  // const handleSubmit = async (type) => {
-  //   if (!prompt) return alert("Please enter a prompt");
-  //   try {
-  //     setGeneratingImg(true);
-  //     const response = await fetch("http://localhost:8080/api/v1/dalle")
-  //     }
-
-  //   catch(error) {
-  //     alert(error);
-  //   }
-  //   finally {
-  //     setGeneratingImg(false);
-  //     setActiveEditorTab("");
-  //   }
-
-  //   }
+ 
+  
 
   const handleDecalsUpdate = (type, result) => {
     const decalType = DecalTypes[type];
@@ -92,7 +78,7 @@ const Customizer = () => {
       
       {!snap.intro && (
         <>
-        <motion.div key='custom' className='absolute z-10 top-0 left-0' {...slideAnimation('left')}>
+        <motion.div key='custom' className='absolute z-10 top-0 left-1' {...slideAnimation('left')}>
             
           <div className='flex items-center min-h-screen'>
             <div className='editortabs-container tabs'>
@@ -111,6 +97,15 @@ const Customizer = () => {
           customStyles={'w-fit px-4 py-2.5 rounded-md mt-5'}/>
 
         </motion.div>
+    
+        <motion.div 
+          className='absolute z-10 top-20 left-5' 
+          {...fadeAnimation}>
+          <CustomButton type='filled' title='Download' handleClick= {handleDownload}
+          customStyles={'w-fit px-4 py-2.5 rounded-md mt-5'}/>
+
+        </motion.div>
+        
 
         <motion.div className='filtertabs-container' {...slideAnimation('up')}>
           {FilterTabs.map((tab) => (
@@ -120,6 +115,7 @@ const Customizer = () => {
             handleClick={() => handleActiveFilterTab(tab.name)}/>
           ))}
         </motion.div>
+        
         </>
         
       )}
